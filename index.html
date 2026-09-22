@@ -1,0 +1,625 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Retail 24 · Income Statement · Data Model</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 32px 20px 48px;
+  }
+  .page { max-width: 780px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    border-bottom: 2px solid #1f2328;
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+  }
+  .logo-block {
+    flex-shrink: 0;
+    background: #1f2328;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+  .header-text h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+  }
+  .header-text p {
+    font-size: 13px;
+    color: #57606a;
+    margin-top: 2px;
+  }
+  .badge {
+    display: inline-block;
+    background: #f0f6ff;
+    color: #3b82d4;
+    border: 1px solid #bcd4f6;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    margin-right: 5px;
+    white-space: nowrap;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #57606a;
+    margin-bottom: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  section { margin-bottom: 28px; }
+
+  /* ── STORY ROW ── */
+  .story {
+    background: #f7f8fa;
+    border-left: 3px solid #3b82d4;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #1f2328;
+  }
+  .story strong { color: #3b82d4; }
+
+  /* ── CUBE CARD ── */
+  .cube-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .kpi-box {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .kpi-box .kpi-label { font-size: 11px; color: #57606a; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+  .kpi-box .kpi-value { font-size: 17px; font-weight: 700; color: #1f2328; margin-top: 2px; }
+  .kpi-box .kpi-sub { font-size: 12px; color: #57606a; }
+
+  /* ── DIM GRID ── */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .dim-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .dim-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    background: #f7f8fa;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .dim-icon {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .dim-icon.time   { background: #fff3cd; }
+  .dim-icon.org    { background: #d4edda; }
+  .dim-icon.acc    { background: #d1ecf1; }
+  .dim-icon.ver    { background: #e2d9f3; }
+  .dim-icon.ccy    { background: #fde8d8; }
+  .dim-name { font-weight: 700; font-size: 13px; }
+  .dim-role { font-size: 10px; color: #57606a; text-transform: uppercase; letter-spacing: .07em; margin-left: auto; }
+  .dim-body { padding: 10px 13px; font-size: 12.5px; }
+
+  /* ── TREE ── */
+  .tree { font-size: 12px; font-family: "SFMono-Regular", Consolas, monospace; line-height: 1.7; }
+  .tree .l0 { font-weight: 700; color: #1f2328; }
+  .tree .l1 { color: #3b82d4; }
+  .tree .l2 { color: #57606a; }
+  .tree .l3 { color: #8b949e; }
+  .tree .leaf { font-style: italic; color: #8b949e; }
+  .indent1 { padding-left: 14px; }
+  .indent2 { padding-left: 28px; }
+  .indent3 { padding-left: 42px; }
+  .indent4 { padding-left: 56px; }
+
+  /* ── ACCOUNT SVG FLOW ── */
+  .flow-wrap { overflow-x: auto; }
+
+  /* ── ORG MAP ── */
+  .org-map {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .org-root {
+    background: #1f2328;
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .org-regions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .org-region {
+    border: 2px solid;
+    border-radius: 6px;
+    padding: 6px 8px;
+    min-width: 120px;
+    text-align: center;
+  }
+  .org-region.am  { border-color: #3b82d4; background: #f0f6ff; }
+  .org-region.eu  { border-color: #10b77a; background: #e8faf4; }
+  .org-region.as  { border-color: #e8881e; background: #fdf3e7; }
+  .org-region-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+  .org-region.am .org-region-title { color: #3b82d4; }
+  .org-region.eu .org-region-title { color: #10b77a; }
+  .org-region.as .org-region-title { color: #e8881e; }
+  .org-leaf { font-size: 11px; color: #57606a; line-height: 1.5; }
+  .org-sub { font-size: 10.5px; color: #8b949e; font-style: italic; }
+  .connector { text-align: center; font-size: 18px; color: #c4ccd4; line-height: 1; }
+
+  /* ── VERSION TABLE ── */
+  .ver-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .ver-table th { text-align: left; padding: 6px 10px; background: #f7f8fa; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: #57606a; }
+  .ver-table td { padding: 5px 10px; border-bottom: 1px solid #f0f1f3; }
+  .ver-table tr:last-child td { border-bottom: none; }
+  .ver-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .dot-actual  { background: #1f2328; }
+  .dot-budget  { background: #3b82d4; }
+  .dot-forecast { background: #10b77a; }
+  .dot-var     { background: #e8881e; }
+  .dot-other   { background: #c4ccd4; }
+
+  /* ── AGENT CAPABILITIES ── */
+  .cap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .cap-item {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 13px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .cap-num {
+    flex-shrink: 0;
+    background: #1f2328;
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cap-text strong { font-size: 13px; display: block; }
+  .cap-text span { font-size: 12px; color: #57606a; }
+
+  /* ── EXAMPLE QUESTIONS ── */
+  .ex-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .ex-list li {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-left: 3px solid #7c5cd8;
+    border-radius: 0 6px 6px 0;
+    padding: 7px 12px;
+    font-size: 12.5px;
+    color: #1f2328;
+    font-style: italic;
+  }
+  .ex-group { margin-bottom: 14px; }
+  .ex-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #57606a;
+    margin-bottom: 6px;
+  }
+  .ex-list li.chart    { border-left-color: #3b82d4; }
+  .ex-list li.variance { border-left-color: #e8881e; }
+  .ex-list li.general  { border-left-color: #10b77a; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #8b949e;
+    padding-top: 20px;
+    margin-top: 8px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  @media (max-width: 580px) {
+    .cube-card { grid-template-columns: 1fr 1fr; }
+    .dim-grid { grid-template-columns: 1fr; }
+    .cap-grid { grid-template-columns: 1fr; }
+    .org-regions { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="header">
+    <div class="logo-block">Retail<br />24</div>
+    <div class="header-text">
+      <h1>Income Statement Cube</h1>
+      <p>Workshop Quick Reference  ·  IBM Planning Analytics  ·  AI Agent Interface</p>
+    </div>
+  </div>
+
+  
+  <section>
+    <div class="section-title">The Story</div>
+    <div class="story">
+      <strong>Retail 24</strong> is a global retail company operating across <strong>Americas, Europe, and Asia</strong> — from US state offices to markets in Brazil, Germany, and Singapore. This cube contains the full <strong>Income Statement</strong>: from gross revenue down to net profit, with actuals from <strong>2022–2024</strong> and plans for <strong>2025</strong>. Everything is reported in <strong>USD (base currency)</strong> by default, but local currency views are always one click away.
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">At a Glance</div>
+    <div class="cube-card">
+      <div class="kpi-box">
+        <div class="kpi-label">Cube</div>
+        <div class="kpi-value">Income Statement</div>
+        <div class="kpi-sub">P&amp;L from revenue to net profit</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Time Range</div>
+        <div class="kpi-value">2022 – 2025</div>
+        <div class="kpi-sub">Monthly · Quarterly · Full-Year · YTD</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Dimensions</div>
+        <div class="kpi-value">6  <span style="font-size:13px;color:#57606a">/ 215 elements</span></div>
+        <div class="kpi-sub">Account · Org · Time · Version · Currency</div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">Account Hierarchy — What you can measure</div>
+    <div class="dim-card" style="border-color:#bee3f8">
+      <div class="dim-header">
+        <div class="dim-icon acc">💰</div>
+        <div class="dim-name">Account (Chart of Accounts)</div>
+        <div class="dim-role">Measure</div>
+      </div>
+      <div class="dim-body">
+
+        
+        <div class="flow-wrap" style="margin-bottom:12px">
+          <svg width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block">
+            
+            <rect x="2" y="20" width="110" height="48" rx="5" fill="#d1ecf1" stroke="#7ecfee" stroke-width="1.5"></rect>
+            <text x="57" y="41" text-anchor="middle" font-size="11" font-weight="700" fill="#0d6e8a">Gross Revenue</text>
+            <text x="57" y="56" text-anchor="middle" font-size="10" fill="#0d6e8a">4999</text>
+
+            <text x="125" y="47" text-anchor="middle" font-size="16" fill="#8b949e">−</text>
+
+            <rect x="138" y="20" width="110" height="48" rx="5" fill="#fde8d8" stroke="#f0a96a" stroke-width="1.5"></rect>
+            <text x="193" y="41" text-anchor="middle" font-size="11" font-weight="700" fill="#9a4a08">Cost of Sales</text>
+            <text x="193" y="56" text-anchor="middle" font-size="10" fill="#9a4a08">5999</text>
+
+            <text x="261" y="47" text-anchor="middle" font-size="14" fill="#8b949e">=</text>
+
+            <rect x="274" y="14" width="110" height="60" rx="5" fill="#3b82d4" stroke="#2563b0" stroke-width="1.5"></rect>
+            <text x="329" y="39" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Gross Margin</text>
+            <text x="329" y="54" text-anchor="middle" font-size="10" fill="#dbeafe">GM</text>
+
+            <text x="397" y="47" text-anchor="middle" font-size="14" fill="#8b949e">−</text>
+
+            <rect x="410" y="20" width="118" height="48" rx="5" fill="#e2d9f3" stroke="#a78bda" stroke-width="1.5"></rect>
+            <text x="469" y="41" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">Total Op. Exp.</text>
+            <text x="469" y="56" text-anchor="middle" font-size="10" fill="#5b21b6">TE · 6 categories</text>
+
+            <text x="541" y="47" text-anchor="middle" font-size="14" fill="#8b949e">=</text>
+
+            <rect x="554" y="8" width="110" height="72" rx="5" fill="#1f2328" stroke="#1f2328" stroke-width="1.5"></rect>
+            <text x="609" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Net Profit</text>
+            <text x="609" y="55" text-anchor="middle" font-size="10" fill="#c4ccd4">NP → NPAA</text>
+          </svg>
+        </div>
+
+        
+        <div style="font-size:12px;font-weight:700;color:#57606a;margin-bottom:6px">Total Operating Expenses (TE) — 6 Categories:</div>
+        <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:5px">
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Payroll <span style="color:#8b949e;font-weight:400">6099</span></div>
+            <div style="font-size:11px;color:#57606a">Salaries · Bonus · Benefits · Taxes · Cell Phones</div>
+          </div>
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Office Expense <span style="color:#8b949e;font-weight:400">6199</span></div>
+            <div style="font-size:11px;color:#57606a">Insurance · Equipment · Supplies · Postage · Telephone</div>
+          </div>
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Travel <span style="color:#8b949e;font-weight:400">6299</span></div>
+            <div style="font-size:11px;color:#57606a">Meals · Hotel · Vehicles · Entertaining</div>
+          </div>
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Occupancy <span style="color:#8b949e;font-weight:400">6399</span></div>
+            <div style="font-size:11px;color:#57606a">Rent · Utilities · Maintenance</div>
+          </div>
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Marketing <span style="color:#8b949e;font-weight:400">6499</span></div>
+            <div style="font-size:11px;color:#57606a">Sales Promotion · Advertising</div>
+          </div>
+          <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:5px;padding:5px 8px">
+            <div style="font-weight:700;font-size:12px">Depreciation <span style="color:#8b949e;font-weight:400">6599</span></div>
+            <div style="font-size:11px;color:#57606a">Existing Assets · New Assets</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">Organization — Where in the world?</div>
+    <div class="dim-card" style="border-color:#c3e6cb">
+      <div class="dim-header">
+        <div class="dim-icon org">🌍</div>
+        <div class="dim-name">Organization (34 entities)</div>
+        <div class="dim-role">Identifier</div>
+      </div>
+      <div class="dim-body">
+        <div class="org-map">
+          <div class="org-root">Total Company</div>
+          <div class="connector">↓</div>
+          <div class="org-regions">
+
+            <div class="org-region am">
+              <div class="org-region-title">Americas</div>
+              <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:#3b82d4;margin-bottom:2px">North America</div>
+                  <div class="org-leaf">
+                    <strong>USA</strong><br />
+                    <span class="org-sub">West: California, Washington</span><br />
+                    <span class="org-sub">Central: Michigan, Illinois</span><br />
+                    <span class="org-sub">East: Massachusetts, Maryland, Florida</span>
+                  </div>
+                  <div class="org-leaf" style="margin-top:4px">
+                    <strong>Canada</strong><br />
+                    <span class="org-sub">Ontario · Quebec · British Columbia</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:#3b82d4;margin-bottom:2px">South America</div>
+                  <div class="org-leaf">
+                    <span class="org-sub">Brazil · Colombia</span><br />
+                    <span class="org-sub">Argentina · Mexico</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="org-region eu">
+              <div class="org-region-title">Europe</div>
+              <div class="org-leaf">
+                Germany · France<br />Spain · England
+              </div>
+            </div>
+
+            <div class="org-region as">
+              <div class="org-region-title">Asia</div>
+              <div class="org-leaf">
+                China · Vietnam<br />Thailand · Singapore
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:11.5px;color:#57606a">
+          <strong>Tip:</strong> You can query any level — from a single state like <em>California</em> up to the full <em>Total Company</em> rollup.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">Time &amp; Version — When and what scenario?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+      
+      <div class="dim-card" style="border-color:#ffeeba">
+        <div class="dim-header">
+          <div class="dim-icon time">📅</div>
+          <div class="dim-name">Year &amp; Month</div>
+          <div class="dim-role">Time</div>
+        </div>
+        <div class="dim-body">
+          <div style="margin-bottom:8px">
+            <span class="badge">2022</span>
+            <span class="badge">2023</span>
+            <span class="badge">2024</span>
+            <span class="badge" style="background:#fff3cd;color:#856404;border-color:#ffc107">2025 Plan</span>
+          </div>
+          <div style="font-size:12px;line-height:1.8">
+            <div><strong>Full Year</strong>  <span style="color:#57606a">→ use "Year"</span></div>
+            <div><strong>Quarterly</strong>  <span style="color:#57606a">→ Q1 · Q2 · Q3 · Q4</span></div>
+            <div><strong>Monthly</strong>  <span style="color:#57606a">→ Jan … Dec</span></div>
+            <div><strong>YTD</strong>  <span style="color:#57606a">→ Jan YTD … Dec YTD</span></div>
+          </div>
+          <div style="margin-top:8px;font-size:11.5px;color:#57606a;background:#fffbeb;border-radius:4px;padding:5px 7px">
+            Year-over-year comparisons built in:<br />
+            <em>Variance vs Prior $</em> &amp; <em>Variance vs Prior %</em>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="dim-card" style="border-color:#d8c6f7">
+        <div class="dim-header">
+          <div class="dim-icon ver">🎯</div>
+          <div class="dim-name">Version / Scenario</div>
+          <div class="dim-role">Version</div>
+        </div>
+        <div class="dim-body">
+          <table class="ver-table">
+            <thead>
+              <tr><th>Version</th><th>What it contains</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="ver-dot dot-actual"></span><strong>Actual</strong></td><td>Reported financials</td></tr>
+              <tr><td><span class="ver-dot dot-budget"></span><strong>Budget</strong></td><td>Approved annual plan</td></tr>
+              <tr><td><span class="ver-dot dot-forecast"></span><strong>Forecast</strong></td><td>Rolling forecast</td></tr>
+              <tr><td><span class="ver-dot dot-var"></span>Variance</td><td>Actual minus Budget</td></tr>
+              <tr><td><span class="ver-dot dot-var"></span>Variance%</td><td>Relative deviation</td></tr>
+              <tr><td><span class="ver-dot dot-other"></span>Version 1 / 2</td><td>Scenario planning</td></tr>
+              <tr><td><span class="ver-dot dot-other"></span>Predictive</td><td>AI-driven forecast</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">Currency</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px;background:#fdf3e7;border:1px solid #f9d5a7;border-radius:6px;padding:10px 13px">
+        <div style="font-weight:700;font-size:13px">💵 Base (USD) <span style="background:#e8881e;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;margin-left:4px">Default</span></div>
+        <div style="font-size:12px;color:#57606a;margin-top:3px">All entities translated to US Dollar. Compare across regions on equal footing.</div>
+      </div>
+      <div style="flex:1;min-width:200px;background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:10px 13px">
+        <div style="font-weight:700;font-size:13px">🏦 Local Currency</div>
+        <div style="font-size:12px;color:#57606a;margin-top:3px">Values in each entity's own currency. Useful for isolating FX effects.</div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">MDX Query Planner — What the Agent can do</div>
+    <div class="cap-grid">
+      <div class="cap-item">
+        <div class="cap-num">1</div>
+        <div class="cap-text">
+          <strong>Natural language → Data</strong>
+          <span>Ask in plain English, get structured financial data from the cube.</span>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-num">2</div>
+        <div class="cap-text">
+          <strong>Charts &amp; Visualisations</strong>
+          <span>Request bar charts, pie charts, line trends — rendered directly in the chat.</span>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-num">3</div>
+        <div class="cap-text">
+          <strong>Cross-dimensional Slicing</strong>
+          <span>Combine any region, time period, account, and version in one query.</span>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-num">4</div>
+        <div class="cap-text">
+          <strong>Variance &amp; Trend Analysis</strong>
+          <span>Actual vs. Budget, year-over-year, quarterly progressions — all automated.</span>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-num">5</div>
+        <div class="cap-text">
+          <strong>Hierarchy-aware Drill-down</strong>
+          <span>Start at Total Company, drill into a region, then down to a single state.</span>
+        </div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-num">6</div>
+        <div class="cap-text">
+          <strong>Multi-scenario Comparison</strong>
+          <span>Compare Actual, Budget, Forecast, and Predictive side by side.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section>
+    <div class="section-title">Starter Questions to Inspire</div>
+
+    <div class="ex-group">
+      <div class="ex-group-label">📊 Charts &amp; Visualisations</div>
+      <ul class="ex-list">
+        <li class="chart">"Show the development of our total operating expenses across America, Europe, and Asia from 2022 to 2024 as a stacked bar chart."</li>
+        <li class="chart">"Build a waterfall chart showing how we get from Gross Revenue down to Net Profit in 2024 — show Gross Revenue, Cost of Sales, Gross Margin, Operating Expenses, and Net Profit as a bridge."</li>
+        <li class="chart">"Show me our Gross Margin for each month in 2024 — Actual as bars and Budget as a line so I can see where we drifted off plan."</li>
+        <li class="chart">"Show me the breakdown of our total operating expenses by category in 2024 as a pie chart — Payroll, Occupancy, Depreciation, Marketing, Travel, and Office Expense."</li>
+        <li class="chart">"Compare actual vs budget Net Profit for America, Europe, and Asia in 2024 as a grouped bar chart. Which region missed most?"</li>
+        <li class="chart">"Show me how Payroll, Occupancy, and Depreciation have each trended from 2022 to 2024 as a multi-line chart."</li>
+      </ul>
+    </div>
+
+    <div class="ex-group">
+      <div class="ex-group-label">🔍 Variance &amp; Deviation Analysis</div>
+      <ul class="ex-list">
+        <li class="variance">"Analyse the Net Profit variance in Q2 2024 and explain what drove the gap versus budget — break it down by P&amp;L line and region."</li>
+        <li class="variance">"Do a full deviation analysis for Europe in 2025 and tell me which countries and P&amp;L lines are driving the underperformance."</li>
+      </ul>
+    </div>
+
+    <div class="ex-group">
+      <div class="ex-group-label">💬 General</div>
+      <ul class="ex-list">
+        <li class="general">"What can you do for me?"</li>
+      </ul>
+    </div>
+
+    <div style="margin-top:10px;background:#f0f6ff;border:1px solid #bcd4f6;border-radius:6px;padding:10px 13px;font-size:12.5px;color:#1e4f91">
+      <strong>You know the dimensions — now make it yours.</strong> Mix any combination of account, region, time period, and version. The more specific your question, the richer the insight.
+    </div>
+  </section>
+
+</div>
+
+<div class="footer" style="max-width:780px;margin:0 auto">Made with IBM Bob</div>
+</body>
+</html>
